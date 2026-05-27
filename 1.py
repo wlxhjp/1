@@ -12,7 +12,75 @@ from  从 bs4 import BeautifulSoup
 import  导入 requests
 import  导入 os
 
-# 创建保存目录
+# 创建保存目录from selenium import webdriver
+from selenium.webdriver.edge.service import Service
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from bs4 import BeautifulSoup
+import requests
+import os
+
+if not os.path.exists('shop_images'):
+    os.makedirs('shop_images')
+
+driver = webdriver.Edge()
+driver.get('https://example.com')
+
+html = driver.page_source
+soup = BeautifulSoup(html, 'html.parser')
+
+img_elements = soup.find_all('img', class_='shop-img')
+
+for i, img in enumerate(img_elements):
+    try:
+        img_url = img.get('src')
+        if img_url:
+            if img_url.startswith('//'):
+                img_url = 'https:' + img_url
+            elif img_url.startswith('/'):
+                img_url = driver.current_url.split('/')[0] + '//' + driver.current_url.split('/')[2] + img_url
+            
+            response = requests.get(img_url)
+            if response.status_code == 200:
+                filename = f'shop_images/shop_img_{i+1}.jpg'
+                with open(filename, 'wb') as f:
+                    f.write(response.content)
+                print(f'Downloaded: {filename}')
+    except Exception as e:
+        print(f'Download failed: {e}')
+
+driver.quit()
+print(f'Total downloaded: {len(img_elements)} images')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if not os.path.exists('shop_images'):
     os.makedirs('shop_images')
 
